@@ -1,5 +1,4 @@
 import random
-from db import games, players
 
 def generate_access_code():
     code = ''
@@ -20,7 +19,7 @@ class Game():
             "curr_round":   1,
             "start_time":   None
         }
-        return games.insert_one(game)
+        return game
 
     def read(self, access_code):
         return games.find_one({"access_code": access_code})
