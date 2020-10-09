@@ -3,7 +3,7 @@ import os
 from flask import Flask, request
 from flask_pymongo import PyMongo
 
-from flaskr.gamelogic import Game
+from flaskr.gamelogic import create_game
 
 
 def create_app(test_config=None):
@@ -14,7 +14,6 @@ def create_app(test_config=None):
         MONGO_URI = 'mongodb://tr_mongo/tr_db',
     )
     mongo = PyMongo(app)
-    game_model = Game()
 
     @app.route('/api/game', methods=['POST'])
     def create_game():
@@ -23,7 +22,7 @@ def create_app(test_config=None):
         """   
         if request.method == 'POST':
             mod_name = request.form['player_name']
-            new_game = game_model.create(mod_name)
+            new_game = create_game(mod_name)
             mongo.db.games.insert_one(new_game)
             del new_game["_id"]
             return new_game
