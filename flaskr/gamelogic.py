@@ -9,34 +9,27 @@ def generate_access_code():
 
     return code.upper()
 
+
 class Game():
 
-    def create(self):
+    def create(self, mod_name):
+        mod_player = Player(mod_name, True)
         game = {
             "access_code":  generate_access_code(),
             "state":        "waiting_for_players",
             "rounds":       3,
             "curr_round":   1,
-            "start_time":   None
+            "start_time":   None,
+            "players": [mod_player]
         }
         return game
-
-    def read(self, access_code):
-        return games.find_one({"access_code": access_code})
-
-    def update(self, game):
-        return games.replace_one({"access_code": game["access_code"]}, game, upsert=True)
-
-
-    
 
 
 class Player():
 
-    def __init__(self, name):
+    def __init__(self, name, is_mod):
         self.name = name
         self.is_mod = False
-        self.game = None
         self.card = None
 
     def join_game(self, access_code):
