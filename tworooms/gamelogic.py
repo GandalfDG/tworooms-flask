@@ -1,7 +1,7 @@
 import random
 
 
-def generate_access_code():
+def generate_access_code() -> str:
     code = ''
     possible = 'abcdefghjkmnpqrstuvwxyz23456789'
 
