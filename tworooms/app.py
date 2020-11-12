@@ -1,7 +1,8 @@
 from flask import Flask
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, join_room
 from pymongo import MongoClient
 import gamelogic as gl
+import db as db_utils
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'a secret'
@@ -9,9 +10,10 @@ socketio = SocketIO(app)
 db_client = MongoClient('mongo')
 db = db_client['tworooms_db']
 
+db_utils.init_db_indices(db)
+
 @app.route('/')
 def index():
-    create_game("Jack")
     return 'Hello, World!'
 
 @socketio.on('create_game')
@@ -33,6 +35,7 @@ def create_game(player_name):
     
     # send the room access code back to the creator
     send(access_code)
+    join_room(access_code)
 
 if __name__ == '__main__':
     socketio.run(app)
