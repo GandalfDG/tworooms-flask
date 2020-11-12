@@ -1,5 +1,10 @@
 version: "3.8"
 services:
+    flask:
+        build: ./
+        ports:
+            - "5000:5000"
+
     mongo:
         image: mongo
         restart: always
@@ -8,4 +13,4 @@ services:
         image: mongo-express
         restart: always
         ports:
-            - 8081:8081
+            - "8081:8081"
