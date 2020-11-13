@@ -51,7 +51,7 @@ def join_game(access_code, player_name):
 
     # create a player
     player = gl.create_player(player_name)
-    player_id = db.players.insert_one(player)
+    player_id = db.players.insert_one(player).inserted_id
 
     # add to the list of players
     db.games.update_one({'access_code': access_code}, {'$push': {'players':player_id}})
