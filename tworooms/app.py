@@ -37,5 +37,25 @@ def create_game(player_name):
     send(access_code)
     join_room(access_code)
 
+@socketio.on('join_game')
+def join_game(access_code, player_name):
+    """
+    Find a game with the access code, and add the player to it
+    """
+
+    # find the game or error
+    game = db.games.find_one({'access_code': access_code})
+    if game is None:
+        send("game not found")
+        return
+
+    # create a player
+    player = gl.create_player(player_name)
+    player_id = db.players.insert_one(player)
+
+    # add to the list of players
+    db.games.update_one({'access_code': access_code}, {'$push': {'players':player_id}})
+
+
 if __name__ == '__main__':
     socketio.run(app)
