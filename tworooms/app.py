@@ -55,6 +55,8 @@ def join_game(access_code, player_name):
 
     # add to the list of players
     db.games.update_one({'access_code': access_code}, {'$push': {'players':player_id}})
+    
+    join_room(access_code)
 
 
 if __name__ == '__main__':
