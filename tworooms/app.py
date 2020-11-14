@@ -1,13 +1,15 @@
 from flask import Flask
-from flask_socketio import SocketIO, send, join_room
+from flask_socketio import SocketIO, send, emit, join_room
 import gamelogic as gl
-from db import db, init_db_indices
+import db as db_util
+from db import db
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'a secret'
 socketio = SocketIO(app)
 
-init_db_indices()
+db_util.init_db_indices()
 
 @app.route('/')
 def index():
@@ -52,7 +54,7 @@ def join_game(access_code, player_name):
     db.games.update_one({'access_code': access_code}, {'$push': {'players':player}})
     
     join_room(access_code)
-
+    emit('lobby_update', {'players': db_util.get_players_in_lobby(access_code)}, room=access_code)
 
 if __name__ == '__main__':
     socketio.run(app)

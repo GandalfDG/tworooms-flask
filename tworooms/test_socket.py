@@ -29,6 +29,9 @@ class SocketTest(unittest.TestCase):
         self.assertIn('player2', lobby_players)
         self.assertNotIn('player3', lobby_players)
 
+        received = self.client1.get_received()
+        self.assertIn('player1', received[0]['args'][0]['players'])
+
 
 if __name__ == "__main__":
     unittest.main()
