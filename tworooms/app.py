@@ -11,9 +11,11 @@ socketio = SocketIO(app)
 
 db_util.init_db_indices()
 
+
 @app.route('/')
 def index():
     return 'Hello, World!'
+
 
 @socketio.on('create_game')
 def create_game(player_name):
@@ -23,17 +25,18 @@ def create_game(player_name):
 
     # create a player with player_name who is the moderator
     player = gl.create_player(player_name, True)
-    
+
     # generate an access code for the game
     access_code = gl.generate_access_code()
 
     # create a game with the player and access code
     game = gl.create_game(access_code, player)
     db.games.insert_one(game)
-    
+
     # send the room access code back to the creator
     send(access_code)
     join_room(access_code)
+
 
 @socketio.on('join_game')
 def join_game(access_code, player_name):
@@ -42,7 +45,7 @@ def join_game(access_code, player_name):
     """
 
     # find the game or error
-    game = db.games.find_one({'access_code': access_code})
+    game = db_util.get_game(access_code)
     if game is None:
         send("game not found")
         return
@@ -51,10 +54,23 @@ def join_game(access_code, player_name):
     player = gl.create_player(player_name)
 
     # add to the list of players
-    db.games.update_one({'access_code': access_code}, {'$push': {'players':player}})
-    
+    db.games.update_one({'access_code': access_code}, {
+                        '$push': {'players': player}})
+
     join_room(access_code)
-    emit('lobby_update', {'players': db_util.get_players_in_lobby(access_code)}, room=access_code)
+    emit('lobby_update', {'players': db_util.get_players_in_lobby(
+        access_code)}, room=access_code)
+
+
+@socketio.on('close_lobby')
+def close_lobby(access_code):
+    """
+    Close the lobby and direct each player to their starting room 
+    """
+    game = db_util.get_game(access_code)
+    num_players = len(game['players'])
+    gl.get_shuffled_rooms(num_players)
+
 
 if __name__ == '__main__':
     socketio.run(app)

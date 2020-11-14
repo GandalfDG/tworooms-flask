@@ -2,6 +2,7 @@ import unittest
 
 from app import app, socketio, db
 import db as db_util
+import gamelogic as gl
 from flask_socketio import SocketIOTestClient
 
 
@@ -31,6 +32,14 @@ class SocketTest(unittest.TestCase):
 
         received = self.client1.get_received()
         self.assertIn('player1', received[0]['args'][0]['players'])
+
+
+class GameLogicTest(unittest.TestCase):
+
+    def test_shuffle_rooms(self):
+        players = 7
+        rooms = gl.get_shuffled_rooms(players)
+        self.assertTrue(len(rooms) == players)
 
 
 if __name__ == "__main__":
