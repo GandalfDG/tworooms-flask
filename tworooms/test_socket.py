@@ -33,6 +33,15 @@ class SocketTest(unittest.TestCase):
         received = self.client1.get_received()
         self.assertIn('player1', received[0]['args'][0]['players'])
 
+    def test_close_lobby(self):
+        self.client1.emit("create_game", "player1")
+        access_code = self.client1.get_received()[0]['args']
+        self.client2.emit("join_game", access_code, "player2")
+        game = db_util.get_game(access_code)
+        self.assertIsNone(game['players'][0]['start_room'])
+        self.client1.emit('close_lobby', access_code)
+        game = db_util.get_game(access_code)
+        self.assertIsNotNone(game['players'][0]['start_room'])
 
 class GameLogicTest(unittest.TestCase):
 

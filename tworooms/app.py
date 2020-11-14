@@ -69,7 +69,13 @@ def close_lobby(access_code):
     """
     game = db_util.get_game(access_code)
     num_players = len(game['players'])
-    gl.get_shuffled_rooms(num_players)
+    rooms = gl.get_shuffled_rooms(num_players)
+
+    for room, player in zip(rooms, game['players']):
+        player['start_room'] = room
+
+    db.games.find_one_and_update({'access_code': access_code}, 
+                                 {'$set': {'players': game['players']}})
 
 
 if __name__ == '__main__':
