@@ -21,13 +21,12 @@ def create_game(player_name):
 
     # create a player with player_name who is the moderator
     player = gl.create_player(player_name, True)
-    player_id = db.players.insert_one(player).inserted_id
     
     # generate an access code for the game
     access_code = gl.generate_access_code()
 
     # create a game with the player and access code
-    game = gl.create_game(access_code, player_id)
+    game = gl.create_game(access_code, player)
     db.games.insert_one(game)
     
     # send the room access code back to the creator
@@ -48,10 +47,9 @@ def join_game(access_code, player_name):
 
     # create a player
     player = gl.create_player(player_name)
-    player_id = db.players.insert_one(player).inserted_id
 
     # add to the list of players
-    db.games.update_one({'access_code': access_code}, {'$push': {'players':player_id}})
+    db.games.update_one({'access_code': access_code}, {'$push': {'players':player}})
     
     join_room(access_code)
 

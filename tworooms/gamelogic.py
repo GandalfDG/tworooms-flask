@@ -11,14 +11,14 @@ def generate_access_code() -> str:
     return code.upper()
 
 
-def create_game(access_code, mod_id):
+def create_game(access_code, mod_player):
     game = {
         "access_code":  access_code,
         "state":        "waiting_for_players",
         "rounds":       3,
         "curr_round":   1,
         "start_time":   None,
-        "players": [mod_id]
+        "players": [mod_player]
     }
     return game
 
