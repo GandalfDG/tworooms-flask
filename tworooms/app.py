@@ -1,16 +1,13 @@
 from flask import Flask
 from flask_socketio import SocketIO, send, join_room
-from pymongo import MongoClient
 import gamelogic as gl
-import db as db_utils
+from db import db, init_db_indices
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'a secret'
 socketio = SocketIO(app)
-db_client = MongoClient('mongo')
-db = db_client['tworooms_db']
 
-db_utils.init_db_indices(db)
+init_db_indices()
 
 @app.route('/')
 def index():

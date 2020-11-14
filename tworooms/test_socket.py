@@ -1,6 +1,7 @@
 import unittest
 
 from app import app, socketio, db
+import db as db_util
 from flask_socketio import SocketIOTestClient
 
 
@@ -22,6 +23,11 @@ class SocketTest(unittest.TestCase):
         self.client2.emit("join_game", access_code, "player2")
         self.assertTrue(len(db.games.find_one(
             {'access_code': access_code})['players']) == 2)
+
+        lobby_players = db_util.get_players_in_lobby(access_code)
+        self.assertIn('player1', lobby_players)
+        self.assertIn('player2', lobby_players)
+        self.assertNotIn('player3', lobby_players)
 
 
 if __name__ == "__main__":
