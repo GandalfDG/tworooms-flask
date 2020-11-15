@@ -50,7 +50,11 @@ def join_game(access_code, player_name):
     # find the game or error
     game = db_util.get_game(access_code)
     if game is None:
-        send("game not found")
+        send('game not found')
+        return
+
+    if game['state'] != 'waiting_for_players':
+        send('game is in progress')
         return
 
     # create a player

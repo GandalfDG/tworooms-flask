@@ -43,6 +43,15 @@ class SocketTest(unittest.TestCase):
         game = db_util.get_game(access_code)
         self.assertIsNotNone(game['players'][0]['start_room'])
 
+    def test_join_closed_lobby(self):
+        self.client1.emit("create_game", "player1")
+        access_code = self.client1.get_received()[0]['args']
+        self.client1.emit('close_lobby', access_code)
+        self.client2.emit("join_game", access_code, "player2")
+        response = self.client2.get_received()[0]['args']
+        self.assertEqual(response, 'game is in progress')
+        self.assertNotIn('player2', db_util.get_players_in_lobby(access_code))
+
 
 class GameLogicTest(unittest.TestCase):
 
