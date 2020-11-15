@@ -79,9 +79,11 @@ def close_lobby(access_code):
     game = db_util.get_game(access_code)
     num_players = len(game['players'])
     rooms = gl.get_shuffled_rooms(num_players)
+    cards = gl.get_shuffled_card_indices(num_players)
 
-    for room, player in zip(rooms, game['players']):
+    for room, card, player in zip(rooms, cards, game['players']):
         player['start_room'] = room
+        player['card'] = card
 
     # update the players with their rooms and change the game state
     game = db.games.find_one_and_update({'access_code': access_code},
