@@ -4,6 +4,7 @@ from app import app, socketio, db
 import db as db_util
 import gamelogic as gl
 from flask_socketio import SocketIOTestClient
+import random
 
 
 class SocketTest(unittest.TestCase):
@@ -57,8 +58,16 @@ class GameLogicTest(unittest.TestCase):
 
     def test_shuffle_rooms(self):
         players = 7
-        rooms = gl.get_shuffled_rooms(players)
+        rooms = gl.get_shuffled_rooms(players, 123)
         self.assertTrue(len(rooms) == players)
+
+    def test_shuffle_card_indices(self):
+        players = 7
+        indices = gl.get_shuffled_card_indices(players, 123)
+        self.assertTrue(len(indices) == players)
+        self.assertNotIn(7, indices)
+        self.assertIn(6, indices)
+        self.assertIn(0, indices)
 
 
 if __name__ == "__main__":

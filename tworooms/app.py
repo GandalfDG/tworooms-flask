@@ -4,6 +4,7 @@ import gamelogic as gl
 import db as db_util
 from db import db
 from pymongo import ReturnDocument
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -25,7 +26,7 @@ def create_game(player_name):
     """
 
     # create a player with player_name who is the moderator
-    player = gl.create_player(player_name, True)
+    player = db_util.create_player(player_name, True)
 
     # generate an access code for the game
     while True:
@@ -94,9 +95,13 @@ def close_lobby(access_code):
 @socketio.on('start_round')
 def start_round(access_code):
     """
-    Start the round timer
+    Start the round timer by sending the round start time to the players in the room
     """
-    pass
+    start_time = datetime.now().isoformat()
+    game = db.games.find_one_and_update({'access_code': access_code}, {
+        '$set': {'start_time': start_time}}, return_document=ReturnDocument.AFTER)
+
+    emit('start_round', game, room=access_code)
 
 
 if __name__ == '__main__':
