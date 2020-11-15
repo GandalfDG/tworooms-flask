@@ -43,6 +43,7 @@ class SocketTest(unittest.TestCase):
         game = db_util.get_game(access_code)
         self.assertIsNotNone(game['players'][0]['start_room'])
 
+
 class GameLogicTest(unittest.TestCase):
 
     def test_shuffle_rooms(self):

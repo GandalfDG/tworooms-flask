@@ -27,7 +27,10 @@ def create_game(player_name):
     player = gl.create_player(player_name, True)
 
     # generate an access code for the game
-    access_code = gl.generate_access_code()
+    while True:
+        access_code = gl.generate_access_code()
+        if db.games.count_documents({'access_code': access_code}) == 0:
+            break
 
     # create a game with the player and access code
     game = gl.create_game(access_code, player)
@@ -65,7 +68,7 @@ def join_game(access_code, player_name):
 @socketio.on('close_lobby')
 def close_lobby(access_code):
     """
-    Close the lobby and direct each player to their starting room 
+    Close the lobby and direct each player to their starting room
     """
     game = db_util.get_game(access_code)
     num_players = len(game['players'])
@@ -74,8 +77,11 @@ def close_lobby(access_code):
     for room, player in zip(rooms, game['players']):
         player['start_room'] = room
 
-    db.games.find_one_and_update({'access_code': access_code}, 
-                                 {'$set': {'players': game['players']}})
+    # update the players with their rooms and change the game state
+    db.games.find_one_and_update({'access_code': access_code},
+                                 {'$set': {'players': game['players'],
+                                           'state': 'readying_rooms'}})
+
 
 
 if __name__ == '__main__':
