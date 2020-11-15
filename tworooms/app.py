@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, send, emit, join_room
 import gamelogic as gl
 import db as db_util
 from db import db
+from pymongo import ReturnDocument
 
 
 app = Flask(__name__)
@@ -82,9 +83,13 @@ def close_lobby(access_code):
         player['start_room'] = room
 
     # update the players with their rooms and change the game state
-    db.games.find_one_and_update({'access_code': access_code},
-                                 {'$set': {'players': game['players'],
-                                           'state': 'readying_rooms'}})
+    game = db.games.find_one_and_update({'access_code': access_code},
+                                        {'$set': {'players': game['players'],
+                                                  'state': 'readying_rooms'}},
+                                        return_document=ReturnDocument.AFTER)
+
+    emit('game_update', game, room=access_code)
+
 
 
 
