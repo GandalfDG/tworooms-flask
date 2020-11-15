@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 
-db_client = MongoClient('mongo')
-db = db_client['tworooms_db']
+db = MongoClient('mongo')['tworooms_db']
 
 
 def init_db_indices():
@@ -19,3 +18,25 @@ def get_players_in_lobby(access_code: str) -> list:
         player_names.append(player.get('name'))
 
     return player_names
+
+
+def create_game(access_code, mod_player):
+    game = {
+        "access_code":  access_code,
+        "state":        "waiting_for_players",
+        "rounds":       3,
+        "curr_round":   1,
+        "start_time":   None,
+        "players": [mod_player]
+    }
+    return game
+
+
+def create_player(name, is_mod=False):
+    player = {
+        "name": name,
+        "is_mod": is_mod,
+        "start_room": None,
+        "card": None
+    }
+    return player

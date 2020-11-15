@@ -34,7 +34,7 @@ def create_game(player_name):
             break
 
     # create a game with the player and access code
-    game = gl.create_game(access_code, player)
+    game = db_util.create_game(access_code, player)
     db.games.insert_one(game)
 
     # send the room access code back to the creator
@@ -59,7 +59,7 @@ def join_game(access_code, player_name):
         return
 
     # create a player
-    player = gl.create_player(player_name)
+    player = db_util.create_player(player_name)
 
     # add to the list of players
     db.games.update_one({'access_code': access_code}, {
@@ -91,6 +91,12 @@ def close_lobby(access_code):
     emit('game_update', game, room=access_code)
 
 
+@socketio.on('start_round')
+def start_round(access_code):
+    """
+    Start the round timer
+    """
+    pass
 
 
 if __name__ == '__main__':
