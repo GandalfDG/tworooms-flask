@@ -7,7 +7,7 @@ from flask_socketio import SocketIOTestClient
 import random
 
 
-class SocketTest(unittest.TestCase):
+class RoomTests(unittest.TestCase):
 
     def setUp(self):
         self.client1 = SocketIOTestClient(app, socketio)
@@ -52,6 +52,27 @@ class SocketTest(unittest.TestCase):
         response = self.client2.get_received()[0]['args']
         self.assertEqual(response, 'game is in progress')
         self.assertNotIn('player2', db_util.get_players_in_lobby(access_code))
+
+
+class GamePlayTests(unittest.TestCase):
+
+    def setUp(self):
+        self.clients = []
+        for i in range(6):
+            self.clients.append(SocketIOTestClient(app, socketio))
+
+        self.clients[0].emit('create_game', 'player1')
+        self.access_code = self.clients[0].get_received()[0]['args']
+        for i in range(1, 6):
+            self.clients[i].emit('join_game', self.access_code, f'player{i}')
+
+        self.clients[0].emit('close_lobby', self.access_code)
+
+    def testStartRound(self):
+        self.clients[0].emit('start_round', self.access_code)
+        received = self.clients[0].get_received()
+        game = received[-1]['args'][0]
+        self.assertIsNotNone(game['start_time'])
 
 
 class GameLogicTest(unittest.TestCase):
