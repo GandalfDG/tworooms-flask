@@ -6,13 +6,15 @@ from db import db
 from pymongo import ReturnDocument
 from datetime import datetime
 
+socketio = SocketIO()
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a secret'
-socketio = SocketIO(app)
 
-db_util.init_db_indices()
+def create_app(debug=false):
+    app = Flask(__name__)
+    app.debug = debug
 
+    socketio.init_app(app)
+    return app
 
 @app.route('/')
 def index():
